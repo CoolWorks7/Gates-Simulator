@@ -31,7 +31,8 @@ class Gates {
         let yMax = s.y + s.height
         let yMin = s.y
 
-        return (this.x < xMax && this.x > xMin) && (this.y < yMax && this.y > yMin)
+        return ((this.x < xMax && this.x > xMin) && (this.y < yMax && this.y > yMin) || 
+                (this.x < xMin && this.x > xMax) && (this.y < yMin && this.y > yMax))
     }
 
     setContextProperty(ctx) {
