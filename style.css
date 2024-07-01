@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+:root {
+    --col-1: #030064;
+    --col-2: #e0dfff;
+    --col-3: #6965db;
+    --col-3-light: #6965dbab;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    min-height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior-x: contain;
+}
+
+#canvas{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+}
+
+
+.top-nav {
+    padding: 0.3rem;
+    background: #fff;
+    box-shadow: 
+        0px 0px 1px 0px rgba(0, 0, 0, .17), 
+        0px 0px 3px 0px rgba(0, 0, 0, .08), 
+        0px 7px 14px 0px rgba(0, 0, 0, .05);
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.3rem;
+    border-radius: 10px;
+}
+.top-nav .item {
+    padding: 0.5rem;
+    border-radius: 7px;
+    height: 2.3rem;
+    width: 2.3rem;
+    cursor: pointer;
+}
+.top-nav .item:hover, .top-nav .item.active {
+    background: var(--col-2);
+}
+.top-nav .item.active path {
+    stroke: var(--col-1);
+}
+.top-nav .item label {
+    display: none;
+}
+
+.context-menu {
+    padding: 0.3rem;
+    position: absolute;
+    display: none;
+    z-index: 100;
+    font-family: 'Poppins', sans-serif;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 
+        0px 0px 1px 0px rgba(0, 0, 0, .17), 
+        0px 0px 3px 0px rgba(0, 0, 0, .08), 
+        0px 7px 14px 0px rgba(0, 0, 0, .05);
+}
+
+.context-menu .option {
+    width: 100px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #000;
+    /* font-weight: 500; */
+}
+.context-menu .option:hover {
+    background: var(--col-3-light);
+    color: #fff;
+}
