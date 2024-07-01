@@ -119,7 +119,6 @@ canvas.addEventListener('mousemove', (e) => {
     let x = e.clientX
     let y = e.clientY
     
-    // some bug here
     if (mousePressed && e.ctrlKey) { // first priority given to move canvas + ctrl
         translate.x += x - prev.x
         translate.y += y - prev.y
