@@ -97,8 +97,8 @@ canvas.addEventListener('mousedown', (e) => {
         let mouseInsideGate = gates[i].checkMouse(x - translate.x, y - translate.y)
 
         if (mouseInsideGate) { // for single movement of 
-            gates[i].offset.x = gates[i].x - x
-            gates[i].offset.y = gates[i].y - y
+            gates[i].offset.x = x - gates[i].x
+            gates[i].offset.y = y - gates[i].y
             gates[i].border = true
             selectedArray.push(gates[i])
             selectedIndex = i
