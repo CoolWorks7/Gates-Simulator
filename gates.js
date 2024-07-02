@@ -8,12 +8,19 @@ class Gates {
         this.actualWidth = 120
         this.width = 70
         this.color1 = '#6965db'
-        // this.color2 = 
         this.offset = {x: 0, y: 0}
         this.r = 3
         this.speed = 5
         this.keys = new Set()
         this.id = nanoid()
+    }
+
+    createNodes(input, output) {
+        this.inputs = {}
+        // for (let i = 0; i < input.length; i++) {
+
+        //     this.inputs[i] = new Node('IN')
+        // }
     }
 
     checkMouse(x, y) {
@@ -157,6 +164,7 @@ export class AND extends Gates{
     constructor(x, y) {
         super(x, y)
         this.name = 'AND'
+        this.createNodes(2, 1)
     }
 
     draw(ctx) {

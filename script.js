@@ -60,8 +60,8 @@ canvas.addEventListener('mousedown', (e) => {
     let x = e.clientX
     let y = e.clientY
     prev = {x, y}
-    selector.x = x
-    selector.y = y
+    selector.x = x - translate.x
+    selector.y = y - translate.y
     mousePressed = true
 
     // setting offset for multiple gates inside the selector
@@ -133,8 +133,8 @@ canvas.addEventListener('mousemove', (e) => {
         })
     }
     else if (mousePressed) {
-        selector.width = x - selector.x
-        selector.height = y - selector.y
+        selector.width = x - selector.x - translate.x
+        selector.height = y - selector.y - translate.y
     }
 })
 
@@ -237,8 +237,8 @@ function animate() {
     if (selector.width != 0 && selector.height != 0) {
         ctx.strokeStyle = '#6965db'
         ctx.strokeRect(
-            selector.x - translate.x, 
-            selector.y - translate.y, 
+            selector.x, 
+            selector.y, 
             selector.width, 
             selector.height)
     }
