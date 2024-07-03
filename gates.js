@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid"
+import { Node } from "./gateNode"
 
 class Gates {
     constructor(x, y) {
@@ -9,18 +10,46 @@ class Gates {
         this.width = 70
         this.color1 = '#6965db'
         this.offset = {x: 0, y: 0}
-        this.r = 3
         this.speed = 5
         this.keys = new Set()
         this.id = nanoid()
     }
 
     createNodes(input, output) {
-        this.inputs = {}
-        // for (let i = 0; i < input.length; i++) {
+        this.inputs = []
+        for (let i = 0; i < input; i++) {
+            let h = this.height/(input*2)
+            let x = this.x - this.actualWidth/2
+            let y = (this.y - this.height/2) + (2*i+1)*h
+            this.inputs.push(new Node('IN', x, y, this))
+        }
+        this.output = new Node('OUT', this.x + this.actualWidth/2, this.y, this)
+        this.nodes = [...this.inputs, this.output]
+    }
 
-        //     this.inputs[i] = new Node('IN')
-        // }
+    updateNodes() {
+        for (let i = 0; i < this.inputs.length; i++) {
+            let h = this.height/(this.inputs.length*2)
+            let x = this.x - this.actualWidth/2
+            let y = (this.y - this.height/2) + (2*i+1)*h
+            this.inputs[i].x = x
+            this.inputs[i].y = y
+        }
+        this.output.x = this.x + this.actualWidth/2
+        this.output.y = this.y
+    }
+
+    startExecution() {
+        let res = this.TRUTH_TABLE
+        this.inputs.forEach(input => {
+            res = res[input.value]
+        })
+        this.output.value = res
+
+        this.output.getDestination().forEach(node => {
+            node.value = this.output.value
+            node.gate.startExecution()
+        })
     }
 
     checkMouse(x, y) {
@@ -42,78 +71,24 @@ class Gates {
                 (this.x < xMin && this.x > xMax) && (this.y < yMin && this.y > yMax))
     }
 
+    draw(ctx) {
+        this.updateNodes()
+        this.showBorder(ctx)
+        this.setContextProperty(ctx)
+        this.drawNodes(ctx)
+    }
+
+    drawNodes(ctx) {
+        this.inputs.forEach(input => {
+            input.draw(ctx)
+        })
+        this.output.draw(ctx)
+    }
+
     setContextProperty(ctx) {
         ctx.lineWidth = 1
         ctx.fillStyle = '#fff'
         ctx.strokeStyle = '#000'
-    }
-
-    drawNodes21(ctx) {
-        let r = this.r
-        ctx.beginPath()
-        ctx.moveTo(this.x + this.width/2, this.y)
-        ctx.lineTo(this.x + this.actualWidth/2, this.y)
-        ctx.closePath()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.moveTo(this.x - this.width/2, this.y - this.height/3.5)
-        ctx.lineTo(this.x - this.actualWidth/2, this.y - this.height/3.5)
-        ctx.closePath()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.moveTo(this.x - this.width/2, this.y + this.height/3.5)
-        ctx.lineTo(this.x - this.actualWidth/2, this.y + this.height/3.5)
-        ctx.closePath()
-        ctx.stroke()
-
-        // circles
-        ctx.beginPath()
-        ctx.arc(this.x + this.actualWidth/2 - r, this.y, r, 0, Math.PI*2)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.arc(this.x - this.actualWidth/2 + r, this.y - this.height/3.5, r, 0, Math.PI*2)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.arc(this.x - this.actualWidth/2 + r, this.y + this.height/3.5, r, 0, Math.PI*2)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-    }
-
-    drawNodes11(ctx) {
-        let r = this.r
-        ctx.beginPath()
-        ctx.moveTo(this.x + this.width/2, this.y)
-        ctx.lineTo(this.x + this.actualWidth/2, this.y)
-        ctx.closePath()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.moveTo(this.x - this.width/2, this.y)
-        ctx.lineTo(this.x - this.actualWidth/2, this.y)
-        ctx.closePath()
-        ctx.stroke()
-
-        //circles
-        ctx.beginPath()
-        ctx.arc(this.x + this.actualWidth/2 - r, this.y, r, 0, Math.PI*2)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-
-        ctx.beginPath()
-        ctx.arc(this.x - this.actualWidth/2 + r, this.y, r, 0, Math.PI*2)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
     }
 
     showBorder(ctx) {
@@ -165,12 +140,14 @@ export class AND extends Gates{
         super(x, y)
         this.name = 'AND'
         this.createNodes(2, 1)
+        this.TRUTH_TABLE = [
+            [0, 0],
+            [0, 1]
+        ]
     }
 
     draw(ctx) {
-        this.showBorder(ctx)
-        this.setContextProperty(ctx)
-        this.drawNodes21(ctx)
+        super.draw(ctx)
 
         // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
         ctx.beginPath()
@@ -190,12 +167,15 @@ export class OR extends Gates{
     constructor(x, y) {
         super(x, y)
         this.name = 'OR'
+        this.createNodes(2, 1)
+        this.TRUTH_TABLE = [
+            [0, 1],
+            [1, 1]
+        ]
     }
 
     draw(ctx) {
-        this.showBorder(ctx)
-        this.setContextProperty(ctx)
-        this.drawNodes21(ctx)
+        super.draw(ctx)
 
         // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
         ctx.beginPath()
@@ -217,12 +197,12 @@ export class NOT extends Gates{
         this.name = 'NOT'
         this.width = this.height
         this.actualWidth = 110
+        this.createNodes(1, 1)
+        this.TRUTH_TABLE = [1, 0]
     }
 
     draw(ctx) {
-        this.showBorder(ctx)
-        this.setContextProperty(ctx)
-        this.drawNodes11(ctx)
+        super.draw(ctx)
 
         // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
         ctx.beginPath()

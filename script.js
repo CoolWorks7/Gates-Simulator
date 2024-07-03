@@ -1,4 +1,5 @@
 import { AND, OR, NOT } from "./gates"
+import { Switch, Bulb } from "./components"
 
 let scaleFactor = 1
 let translate = {x: 0, y: 0}
@@ -16,8 +17,9 @@ let translate = {x: 0, y: 0}
 // moveBtn.onclick = () => flipMove()
 
 
-let createPos = { x: null, y: null } // stores the initial position of gate being created
 let gates = [] // stores all the gates in the canvas
+let powerSwitch = new Switch(50, 50, 70, 40)
+let bulb = new Bulb(800, 200, 25)
 gates.push(new AND(300, 400))
 gates.push(new NOT(600, 200))
 
@@ -51,6 +53,7 @@ canvas.height = window.innerHeight*window.devicePixelRatio
 
 
 
+let pair = []
 let prev={x:0, y:0}
 let selector = {x: 0, y: 0, width: 0, height: 0}
 let selectedArray = []
@@ -70,6 +73,7 @@ canvas.addEventListener('mousedown', (e) => {
         
         // if mouse is inside one of the selected gate, offset each selected gate w.r.t x,y
         if (mouseInsideGate) {
+            console.log('mouseInsideGate', mouseInsideGate);
             if (e.ctrlKey) { // if ctrl is pressend when clicking on the selected gate, remove it from the selectedArray
                 selectedArray[i].border = false
                 selectedArray.splice(i, 1)
@@ -90,6 +94,20 @@ canvas.addEventListener('mousedown', (e) => {
         selectedArray = []
     }
 
+    // check if mouse is inside the power switch output node
+    let mouseInsidePowerSwitchOutput =  powerSwitch.output.checkMouse(x - translate.x, y - translate.y)
+    if (mouseInsidePowerSwitchOutput) {
+        checkPairing(powerSwitch.output)
+    }
+
+    // check if mouse is inside the power switch output node
+    bulb.inputs.forEach(input => {
+        let mouseInsideBulbInput =  input.checkMouse(x - translate.x, y - translate.y)
+        if (mouseInsideBulbInput) {
+            checkPairing(input)
+        }
+    })
+
     let selectedIndex = null
     // setting offset for single gates selected
     for (let i = gates.length - 1; i >= 0; i--) {
@@ -104,6 +122,15 @@ canvas.addEventListener('mousedown', (e) => {
             selectedIndex = i
             break
         }
+
+        // check whether the mouse is withing a gate's input/output node
+        gates[i].nodes.forEach(node => {
+            let mouseInsideGateNode = node.checkMouse(x - translate.x, y - translate.y)
+            if (mouseInsideGateNode) {
+                checkPairing(node)
+            }
+        })
+        
     }
 
     // delete the selected from the array and push it at the end
@@ -113,6 +140,27 @@ canvas.addEventListener('mousedown', (e) => {
     // }
     
 })
+
+function checkPairing(node) {
+    pair.push(node)
+    if (pair.length > 1) {
+        if (pair[0].type != pair[1].type) {
+            let inputNode = pair[0].type == 'IN'? pair[0] : pair[1]
+            let outputNode = pair[0].type == 'OUT'? pair[0] : pair[1]
+            
+            // if the input node does not already has a source
+            if (!inputNode.getSource()) {
+                inputNode.setSource(outputNode)
+                outputNode.setDestination(inputNode)
+            }
+
+            powerSwitch.startExecution() // start execution from the switch
+            pair = [] // after forming the connection, empty the pair list
+        }
+        else pair.length = 1
+    }
+}
+// console.log(gates[0].setInputNodes());
 
 canvas.addEventListener('mousemove', (e) => {
     // animate() // rerender everytime the mouse moves
@@ -233,6 +281,8 @@ function animate() {
         gate.update()
         gate.draw(ctx)
     })
+    powerSwitch.draw(ctx)
+    bulb.draw(ctx)
 
     if (selector.width != 0 && selector.height != 0) {
         ctx.strokeStyle = '#6965db'
