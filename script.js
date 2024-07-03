@@ -1,5 +1,5 @@
-import { AND, OR, NOT } from "./gates"
-import { Switch, Bulb } from "./components"
+import { AND, OR, NOT } from "./js/gates"
+import { Switch, Bulb } from "./js/components"
 
 let scaleFactor = 1
 let translate = {x: 0, y: 0}
