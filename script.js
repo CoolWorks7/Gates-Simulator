@@ -1,5 +1,6 @@
 import { AND, OR, NOT, XOR } from "./js/gates"
 import { Switch, Bulb } from "./js/components"
+import { Connector } from "./js/connector"
 
 let scaleFactor = 1
 let translate = {x: 0, y: 0}
@@ -20,6 +21,8 @@ let theme = 'dark'
 let powerSwitch = new Switch(50, 50, 20, theme)
 let bulb = new Bulb(800, 200, 35, 25, theme)
 let gates = [powerSwitch, bulb] // stores all the gates in the canvas
+let connectors = [] // stores all the connectors in the canvas
+
 gates.push(new AND(300, 400, theme))
 gates.push(new NOT(600, 200, theme))
 
@@ -105,6 +108,7 @@ canvas.addEventListener('mousedown', (e) => {
             if (mouseInsideGateNode) { 
                 mouseInsideGateBool = true
                 checkPairing(node)
+                connectors.push(new Connector(node.x, node.y, node))
             }
         })
 
@@ -121,7 +125,6 @@ canvas.addEventListener('mousedown', (e) => {
         }
     }
     
-    console.log(!mouseInsideGateBool);
     if (!mouseInsideGateBool) pair = [] // checking if a mouse was found inside a node 
 
 
@@ -273,8 +276,12 @@ function animate() {
         gate.update()
         gate.draw(ctx)
     })
-    powerSwitch.draw(ctx)
-    bulb.draw(ctx)
+    connectors.forEach(connector => {
+        connector.update()
+        connector.draw(ctx)
+    })
+    // powerSwitch.draw(ctx)
+    // bulb.draw(ctx)
 
     if (selector.width != 0 && selector.height != 0) {
         ctx.strokeStyle = '#4e8cd7'

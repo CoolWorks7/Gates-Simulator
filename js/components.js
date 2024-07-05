@@ -8,7 +8,7 @@ export class Switch extends Gates {
         this.r = r
         this.width = r
         this.height = r
-        this.output = new Node('OUT', this.x - this.width, this.y, this, this.theme, r)
+        this.output = new Node('OUT', this.x, this.y, this, this.theme, r)
         this.value = 1
         this.nodes = [this.output]
     }

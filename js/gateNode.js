@@ -55,8 +55,8 @@ export class Node{
         this.#destination.forEach(node => {
             ctx.strokeStyle = '#fff'
             ctx.beginPath()
-            ctx.moveTo(this.x + this.r, this.y)
-            ctx.lineTo(node.x + node.r, node.y)
+            ctx.moveTo(this.gate.name == 'SWITCH'? this.x + this.r : this.x, this.y)
+            ctx.lineTo(node.x, node.y)
             ctx.closePath()
             ctx.stroke()
         })
@@ -73,11 +73,10 @@ export class Node{
         if (this.gate.name == 'BULB') {
             ctx.fillStyle = this.theme == 'light'? '#333' : this.theme == 'dark'? '#fff' : '#0000'
             ctx.strokeStyle = this.theme == 'light'? '#333' : this.theme == 'dark'? '#fff' : '#0000'
-            ctx.fillRect(this.x - this.r/2, this.y - this.gate.height/2, this.r, this.gate.height)
-            ctx.strokeRect(this.x - this.r/2, this.y  - this.gate.height/2, this.r, this.gate.height)
+            ctx.fillRect(this.x - this.r/2 -1, this.y - this.gate.height/2, this.r, this.gate.height)
+            ctx.strokeRect(this.x - this.r/2 -1, this.y  - this.gate.height/2, this.r, this.gate.height)
         }
         else if (this.gate.name == 'SWITCH') {
-            // ctx.fillStyle = '#131313'
             ctx.strokeStyle = '#fff'
             ctx.beginPath()
             ctx.arc(this.x + this.r, this.y, this.r, 0, Math.PI*2)
@@ -87,7 +86,7 @@ export class Node{
         }
         else {
             ctx.beginPath()
-            ctx.arc(this.x + this.r, this.y, this.r, 0, Math.PI*2)
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI*2)
             ctx.closePath()
             ctx.fill()
             ctx.stroke()
