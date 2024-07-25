@@ -1,14 +1,14 @@
 import { nanoid } from "nanoid"
 import { Node } from "./gateNode"
 
-class Gates {
-    constructor(x, y) {
+export class Gates {
+    constructor(x, y, theme) {
         this.x = x
         this.y = y
+        this.theme = theme
         this.height = 60
         this.actualWidth = 120
         this.width = 70
-        this.color1 = '#6965db'
         this.offset = {x: 0, y: 0}
         this.speed = 5
         this.keys = new Set()
@@ -21,34 +21,40 @@ class Gates {
             let h = this.height/(input*2)
             let x = this.x - this.actualWidth/2
             let y = (this.y - this.height/2) + (2*i+1)*h
-            this.inputs.push(new Node('IN', x, y, this))
+            this.inputs.push(new Node('IN', x, y, this, this.theme))
         }
-        this.output = new Node('OUT', this.x + this.actualWidth/2, this.y, this)
+        this.output = new Node('OUT', this.x + this.actualWidth/2, this.y, this, this.theme)
         this.nodes = [...this.inputs, this.output]
     }
 
     updateNodes() {
-        for (let i = 0; i < this.inputs.length; i++) {
+        for (let i = 0; i < this.inputs?.length; i++) {
             let h = this.height/(this.inputs.length*2)
             let x = this.x - this.actualWidth/2
             let y = (this.y - this.height/2) + (2*i+1)*h
             this.inputs[i].x = x
             this.inputs[i].y = y
         }
-        this.output.x = this.x + this.actualWidth/2
-        this.output.y = this.y
+        if (this.output) {
+            this.output.x = this.x + this.actualWidth/2
+            this.output.y = this.y
+        }
     }
 
     startExecution() {
-        let res = this.TRUTH_TABLE
+        let res = this.TRUTH_TABLE // read the truth table
         this.inputs.forEach(input => {
             res = res[input.value]
         })
-        this.output.value = res
+        this.output.value = res // store the gates result
 
         this.output.getDestination().forEach(node => {
             node.value = this.output.value
-            node.gate.startExecution()
+            setTimeout(() => {
+                node.startExecution()
+                // if (node.type == 'OUT') node.startExecution()
+                // else node.gate.startExecution()
+            }, 50)
         })
     }
 
@@ -71,58 +77,70 @@ class Gates {
                 (this.x < xMin && this.x > xMax) && (this.y < yMin && this.y > yMax))
     }
 
-    draw(ctx) {
+    draw(ctx, width, line=true) {
         this.updateNodes()
-        this.showBorder(ctx)
+        this.showBorder(ctx, width)
         this.setContextProperty(ctx)
-        this.drawNodes(ctx)
+        this.drawNodes(ctx, line)
     }
 
-    drawNodes(ctx) {
-        this.inputs.forEach(input => {
-            input.draw(ctx)
+    drawNodes(ctx, line=true) {
+        this.inputs && this.inputs.forEach(input => {
+            input.draw(ctx, line)
         })
-        this.output.draw(ctx)
+        this.output && this.output.draw(ctx, line)
     }
 
     setContextProperty(ctx) {
         ctx.lineWidth = 1
-        ctx.fillStyle = '#fff'
-        ctx.strokeStyle = '#000'
+        if (this.theme == 'light') {
+            ctx.fillStyle = '#fff'
+            ctx.strokeStyle = '#000'
+        }
+        else if (this.theme == 'dark') {
+            ctx.fillStyle = '#131313'
+            ctx.strokeStyle = '#fff'
+        }
+        else {
+            ctx.fillStyle = '#0000'
+            ctx.strokeStyle = '#0000'
+        }
     }
 
-    showBorder(ctx) {
+    showBorder(ctx, width=this.actualWidth) {
         if (!this.border) return
         
         let pad = 10
-        ctx.strokeStyle = '#6965db'
-        ctx.lineWidth = 2
-        ctx.fillStyle = '#fffb'
-        // ctx.strokeRect(this.x-this.actualWidth/2 - pad, this.y-this.height/2 - pad, this.actualWidth + 2*pad, this.height + 2*pad)
-        ctx.fillRect(this.x-this.actualWidth/2 - pad, this.y-this.height/2 - pad, this.actualWidth + 2*pad, this.height + 2*pad)
+        ctx.strokeStyle = '#4e8cd7'
+        ctx.lineWidth = 1
+        // ctx.fillStyle = '#0002'
+        // ctx.setLineDash([15, 15]);
+        // ctx.strokeRect(this.x-this.actualWidth/2 - 1.5*pad, this.y-this.height/2 - 2*pad, this.actualWidth + 3*pad, this.height + 4*pad)
+        // ctx.setLineDash([0, 0]);
+        // ctx.fillRect(this.x-this.actualWidth/2 - pad, this.y-this.height/2 - pad, this.actualWidth + 2*pad, this.height + 2*pad)
     
         ctx.beginPath()
-        ctx.moveTo(this.x-this.actualWidth/2 - pad, this.y - this.height/2 + pad)
-        ctx.lineTo(this.x-this.actualWidth/2 - pad, this.y - this.height/2 - pad)
-        ctx.lineTo(this.x-this.actualWidth/2 + pad, this.y - this.height/2 - pad)
+        ctx.moveTo(this.x-width/2 - pad, this.y - this.height/2 + pad)
+        ctx.lineTo(this.x-width/2 - pad, this.y - this.height/2 - pad)
+        ctx.lineTo(this.x-width/2 + pad, this.y - this.height/2 - pad)
         ctx.stroke()
 
         ctx.beginPath()
-        ctx.moveTo(this.x+this.actualWidth/2 + pad, this.y - this.height/2 + pad)
-        ctx.lineTo(this.x+this.actualWidth/2 + pad, this.y - this.height/2 - pad)
-        ctx.lineTo(this.x+this.actualWidth/2 - pad, this.y - this.height/2 - pad)
+        ctx.moveTo(this.x+width/2 + pad, this.y - this.height/2 + pad)
+        ctx.lineTo(this.x+width/2 + pad, this.y - this.height/2 - pad)
+        ctx.lineTo(this.x+width/2 - pad, this.y - this.height/2 - pad)
         ctx.stroke()
 
         ctx.beginPath()
-        ctx.moveTo(this.x-this.actualWidth/2 - pad, this.y + this.height/2 - pad)
-        ctx.lineTo(this.x-this.actualWidth/2 - pad, this.y + this.height/2 + pad)
-        ctx.lineTo(this.x-this.actualWidth/2 + pad, this.y + this.height/2 + pad)
+        ctx.moveTo(this.x-width/2 - pad, this.y + this.height/2 - pad)
+        ctx.lineTo(this.x-width/2 - pad, this.y + this.height/2 + pad)
+        ctx.lineTo(this.x-width/2 + pad, this.y + this.height/2 + pad)
         ctx.stroke()
 
         ctx.beginPath()
-        ctx.moveTo(this.x+this.actualWidth/2 + pad, this.y + this.height/2 - pad)
-        ctx.lineTo(this.x+this.actualWidth/2 + pad, this.y + this.height/2 + pad)
-        ctx.lineTo(this.x+this.actualWidth/2 - pad, this.y + this.height/2 + pad)
+        ctx.moveTo(this.x+width/2 + pad, this.y + this.height/2 - pad)
+        ctx.lineTo(this.x+width/2 + pad, this.y + this.height/2 + pad)
+        ctx.lineTo(this.x+width/2 - pad, this.y + this.height/2 + pad)
         ctx.stroke()
 
     }
@@ -136,8 +154,8 @@ class Gates {
 }
 
 export class AND extends Gates{
-    constructor(x, y) {
-        super(x, y)
+    constructor(x, y, theme) {
+        super(x, y, theme)
         this.name = 'AND'
         this.createNodes(2, 1)
         this.TRUTH_TABLE = [
@@ -164,8 +182,8 @@ export class AND extends Gates{
 
 
 export class OR extends Gates{
-    constructor(x, y) {
-        super(x, y)
+    constructor(x, y, theme) {
+        super(x, y, theme)
         this.name = 'OR'
         this.createNodes(2, 1)
         this.TRUTH_TABLE = [
@@ -192,13 +210,46 @@ export class OR extends Gates{
 }
 
 export class NOT extends Gates{
-    constructor(x, y) {
-        super(x, y)
+    constructor(x, y, theme) {
+        super(x, y, theme)
         this.name = 'NOT'
         this.width = this.height
         this.actualWidth = 110
         this.createNodes(1, 1)
         this.TRUTH_TABLE = [1, 0]
+    }
+
+    draw(ctx) {
+        super.draw(ctx)
+
+        // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
+        ctx.beginPath()
+        ctx.moveTo(this.x - this.width/2, this.y + this.height/2)
+        ctx.lineTo(this.x - this.width/2, this.y - this.height/2)
+        ctx.lineTo(this.x + this.width/2.5, this.y)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.arc(this.x + this.width/2, this.y, 5, 0, 2*Math.PI)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+    }
+}
+
+export class XOR extends Gates{
+    constructor(x, y, theme) {
+        super(x, y, theme)
+        this.name = 'XOR'
+        this.width = this.height
+        this.actualWidth = 110
+        this.createNodes(2, 1)
+        this.TRUTH_TABLE = [
+            [0, 1],
+            [1, 0]
+        ]
     }
 
     draw(ctx) {
