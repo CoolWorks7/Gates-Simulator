@@ -50,17 +50,26 @@ export class Node{
         }
     }
 
-    draw(ctx, line = true) {
-        // drawing the line from this output -> next inputs
-        this.#destination.forEach(node => {
-            ctx.strokeStyle = '#fff'
-            ctx.beginPath()
-            ctx.moveTo(this.gate.name == 'SWITCH'? this.x + this.r : this.x, this.y)
-            ctx.lineTo(node.x, node.y)
-            ctx.closePath()
-            ctx.stroke()
-        })
+    startExecution() {
+        // If the node is an input of a gate, execute the gate
+        if (this.type == 'IN') this.gate.startExecution()
+        // the node if not an input node then execute its following nodes
+        else {
+            this.getDestination().forEach(node => {
+                node.value = this.value
+                node.startExecution()
+            })
+        }
+    }
 
+    link(outputNode) {
+        this.setDestination(outputNode)
+        outputNode.setSource(this)
+    }
+
+    draw(ctx, line = true) {
+
+        // the line between node and the gate is draw only for gates and not for components
         if (line) {
             ctx.strokeStyle = this.theme == 'light'? '#333' : this.theme == 'dark'? '#fff' : '#0000'
             ctx.beginPath()
@@ -76,14 +85,15 @@ export class Node{
             ctx.fillRect(this.x - this.r/2 -1, this.y - this.gate.height/2, this.r, this.gate.height)
             ctx.strokeRect(this.x - this.r/2 -1, this.y  - this.gate.height/2, this.r, this.gate.height)
         }
-        else if (this.gate.name == 'SWITCH') {
-            ctx.strokeStyle = '#fff'
-            ctx.beginPath()
-            ctx.arc(this.x + this.r, this.y, this.r, 0, Math.PI*2)
-            ctx.closePath()
-            ctx.fill()
-            ctx.stroke()
-        }
+        // else if (this.gate.name == 'SWITCH') {
+        //     // console.log(this.x, this.y);
+        //     ctx.strokeStyle = '#fff'
+        //     ctx.beginPath()
+        //     ctx.arc(this.x, this.y, this.r, 0, Math.PI*2)
+        //     ctx.closePath()
+        //     ctx.fill()
+        //     ctx.stroke()
+        // }
         else {
             ctx.beginPath()
             ctx.arc(this.x, this.y, this.r, 0, Math.PI*2)

@@ -42,16 +42,18 @@ export class Gates {
     }
 
     startExecution() {
-        let res = this.TRUTH_TABLE
+        let res = this.TRUTH_TABLE // read the truth table
         this.inputs.forEach(input => {
             res = res[input.value]
         })
-        this.output.value = res
+        this.output.value = res // store the gates result
 
         this.output.getDestination().forEach(node => {
             node.value = this.output.value
             setTimeout(() => {
-                node.gate.startExecution()
+                node.startExecution()
+                // if (node.type == 'OUT') node.startExecution()
+                // else node.gate.startExecution()
             }, 50)
         })
     }

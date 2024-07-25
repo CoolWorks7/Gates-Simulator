@@ -107,8 +107,9 @@ canvas.addEventListener('mousedown', (e) => {
             let mouseInsideGateNode = node.checkMouse(x - translate.x, y - translate.y)
             if (mouseInsideGateNode) { 
                 mouseInsideGateBool = true
-                checkPairing(node)
-                connectors.push(new Connector(node.x, node.y, node))
+                let connector = new Connector('OUT', node.x, node.y, node.gate, node, node.theme)
+                connectors.push(connector)
+                checkPairing(node, connector)
             }
         })
 
@@ -125,7 +126,13 @@ canvas.addEventListener('mousedown', (e) => {
         }
     }
     
-    if (!mouseInsideGateBool) pair = [] // checking if a mouse was found inside a node 
+    // checking if a mouse was found inside a node 
+    if (!mouseInsideGateBool) {
+        pair.forEach(node => {
+            connectors = connectors.filter(connector => connector.id != node[1].id)
+        })
+        pair = []
+    }
 
 
     // delete the selected from the array and push it at the end
@@ -136,25 +143,29 @@ canvas.addEventListener('mousedown', (e) => {
     
 })
 
-function checkPairing(node) {
-    pair.push(node)
+function checkPairing(node, connector) {
+    pair.push([node, connector])
     if (pair.length > 1) {
-        if (pair[0].type != pair[1].type) {
-            let inputNode = pair[0].type == 'IN'? pair[0] : pair[1]
-            let outputNode = pair[0].type == 'OUT'? pair[0] : pair[1]
-            
+        if (pair[0][0].type != pair[1][0].type) {
+            let inputNode = pair[0][0].type == 'IN'? pair[0] : pair[1]
+            let outputNode = pair[0][0].type == 'OUT'? pair[0] : pair[1]
+
             // if the input node does not already has a source
-            if (!inputNode.getSource()) {
-                inputNode.setSource(outputNode)
-                outputNode.setDestination(inputNode)
+            if (!inputNode[0].getSource()) {
+                outputNode[0].link(outputNode[1])
+                outputNode[1].link(inputNode[1])
+                inputNode[1].link(inputNode[0])
+
+                // console.log(outputNode[1].getDestination());
             }
 
-            pair = [] // after forming the connection, empty the pair list
+            // after forming the connection, empty the pair list
+            pair = []
         }
         else pair.length = 1
     }
 }
-// console.log(gates[0].setInputNodes());
+
 
 canvas.addEventListener('mousemove', (e) => {
     // animate() // rerender everytime the mouse moves
@@ -271,14 +282,16 @@ function animate() {
     ctx.scale(window.devicePixelRatio*scaleFactor, window.devicePixelRatio*scaleFactor)
     ctx.translate(translate.x, translate.y)
 
+    
+    connectors.forEach(connector => {
+        connector.update()
+        connector.draw(ctx)
+    })
+    
     // drawing all the gates in the gates list
     gates.forEach(gate => {
         gate.update()
         gate.draw(ctx)
-    })
-    connectors.forEach(connector => {
-        connector.update()
-        connector.draw(ctx)
     })
     // powerSwitch.draw(ctx)
     // bulb.draw(ctx)
