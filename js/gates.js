@@ -113,12 +113,7 @@ export class Gates {
         let pad = 10
         ctx.strokeStyle = '#4e8cd7'
         ctx.lineWidth = 1
-        // ctx.fillStyle = '#0002'
-        // ctx.setLineDash([15, 15]);
-        // ctx.strokeRect(this.x-this.actualWidth/2 - 1.5*pad, this.y-this.height/2 - 2*pad, this.actualWidth + 3*pad, this.height + 4*pad)
-        // ctx.setLineDash([0, 0]);
-        // ctx.fillRect(this.x-this.actualWidth/2 - pad, this.y-this.height/2 - pad, this.actualWidth + 2*pad, this.height + 2*pad)
-    
+
         ctx.beginPath()
         ctx.moveTo(this.x-width/2 - pad, this.y - this.height/2 + pad)
         ctx.lineTo(this.x-width/2 - pad, this.y - this.height/2 - pad)
@@ -239,6 +234,73 @@ export class NOT extends Gates{
     }
 }
 
+export class NAND extends Gates{
+    constructor(x, y, theme) {
+        super(x, y, theme)
+        this.name = 'NAND'
+        this.createNodes(2, 1)
+        this.TRUTH_TABLE = [
+            [1, 1],
+            [1, 0]
+        ]
+    }
+
+    draw(ctx) {
+        super.draw(ctx)
+
+        // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
+        ctx.beginPath()
+        ctx.moveTo(this.x - this.width/2, this.y - this.height/2)
+        ctx.lineTo(this.x + this.width/2 - this.height/2, this.y - this.height/2)
+        ctx.arc(this.x + this.width/2 - this.height/2, this.y, this.height/2, -Math.PI/2, Math.PI/2)
+        ctx.lineTo(this.x - this.width/2, this.y + this.height/2)
+        ctx.lineTo(this.x - this.width/2, this.y - this.height/2)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.arc(this.x + this.width/1.75, this.y, 5, 0, 2*Math.PI)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+    }
+}
+
+export class NOR extends Gates{
+    constructor(x, y, theme) {
+        super(x, y, theme)
+        this.name = 'NOR'
+        this.createNodes(2, 1)
+        this.TRUTH_TABLE = [
+            [1, 0],
+            [0, 0]
+        ]
+    }
+
+    draw(ctx) {
+        super.draw(ctx)
+
+        // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
+        ctx.beginPath()
+        ctx.moveTo(this.x - this.width/1.8, this.y + this.height/2)
+        ctx.quadraticCurveTo(this.x - this.width/3 , this.y, this.x - this.width/1.8, this.y - this.height/2)
+        ctx.bezierCurveTo(
+            this.x + this.width/1.2, this.y - this.height/2.3, 
+            this.x + this.width/1.2, this.y + this.height/2.3,
+            this.x - this.width/1.8, this.y + this.height/2
+        )
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.arc(this.x + this.width/1.75, this.y, 5, 0, 2*Math.PI)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+    }
+}
+
 export class XOR extends Gates{
     constructor(x, y, theme) {
         super(x, y, theme)
@@ -257,17 +319,20 @@ export class XOR extends Gates{
 
         // ctx.strokeRect(this.x - this.actualWidth/2, this.y - this.height/2, this.actualWidth, this.height)
         ctx.beginPath()
-        ctx.moveTo(this.x - this.width/2, this.y + this.height/2)
-        ctx.lineTo(this.x - this.width/2, this.y - this.height/2)
-        ctx.lineTo(this.x + this.width/2.5, this.y)
-        ctx.closePath()
+        ctx.moveTo(this.x - this.width/1.8, this.y + this.height/2)
+        ctx.quadraticCurveTo(this.x - this.width/3 , this.y, this.x - this.width/1.8, this.y - this.height/2)
+        ctx.bezierCurveTo(
+            this.x + this.width/1.2, this.y - this.height/2.3, 
+            this.x + this.width/1.2, this.y + this.height/2.3,
+            this.x - this.width/1.8, this.y + this.height/2
+        )
         ctx.fill()
         ctx.stroke()
 
         ctx.beginPath()
-        ctx.arc(this.x + this.width/2, this.y, 5, 0, 2*Math.PI)
-        ctx.closePath()
-        ctx.fill()
+        ctx.moveTo(this.x - this.width/1.5, this.y + this.height/2)
+        ctx.quadraticCurveTo(this.x - this.width/2.5 , this.y, this.x - this.width/1.5, this.y - this.height/2)
         ctx.stroke()
+        
     }
 }

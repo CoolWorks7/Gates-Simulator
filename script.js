@@ -1,4 +1,4 @@
-import { AND, OR, NOT, XOR } from "./js/gates"
+import { AND, OR, NOT, NAND, NOR, XOR } from "./js/gates"
 import { Switch, Bulb } from "./js/components"
 import { Connector } from "./js/connector"
 
@@ -31,8 +31,8 @@ let gatesMenu = [
     {name: 'AND', create: (pos) => gates.push(new AND(pos.x, pos.y, theme))},
     {name: 'OR', create: (pos) => gates.push(new OR(pos.x, pos.y, theme))},
     {name: 'NOT', create: (pos) => gates.push(new NOT(pos.x, pos.y, theme))},
-    // {name: 'NAND'},
-    // {name: 'NOR'},
+    {name: 'NAND', create: (pos) => gates.push(new NAND(pos.x, pos.y, theme))},
+    {name: 'NOR', create: (pos) => gates.push(new NOR(pos.x, pos.y, theme))},
     {name: 'XOR', create: (pos) => gates.push(new XOR(pos.x, pos.y, theme))},
 ]
 gatesMenu.forEach(menu => {
