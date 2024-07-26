@@ -73,7 +73,7 @@ export class Node{
         if (line) {
             ctx.strokeStyle = this.theme == 'light'? '#333' : this.theme == 'dark'? '#fff' : '#0000'
             ctx.beginPath()
-            ctx.moveTo(this.gate.x - this.gate.width/2, this.y)
+            ctx.moveTo(this.gate.x - this.gate.width/2.5, this.y)
             ctx.lineTo(this.x, this.y)
             ctx.closePath()
             ctx.stroke()
