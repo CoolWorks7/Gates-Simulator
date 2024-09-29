@@ -38,40 +38,33 @@ export class Connector extends Node{
         let flipY = distY > 0? 1: -1
 
         // // console.log(distX);
-        // if (distX < 0) {
-        //     let relPosY = point.y - node.gate.y
+        
+        // calculate vertical & horizontal mid
+        let midX = (point.x + lastpoint.x)/2
+        let midY = (point.y + lastpoint.y)/2
+
+        if (distX < 0) {
+            let relPosY = point.y - node.gate.y
             
-        //     // calculate vertical & horizontal mid
-        //     let midX = (point.x + lastpoint.x)/2
-        //     let midY = (point.y + lastpoint.y)/2
-    
-        //     let corner1 = {x: lastpoint.x + curveDistance, y: lastpoint.y}
-        //     // let corner1 = {x: midX, y: point.y}
-        //     let corner2 = {x: midX, y: lastpoint.y}
-        //     let curevDist = Math.min(curveDistance, Math.abs(corner1.y - midY))
-    
-        //     let corner11 = {x: lastpoint.x, y: lastpoint.y + curveDistance}
-        //     let corner12 = {x: corner1.x, y: corner1.y - curevDist*flipY}
-        //     let corner21 = {x: corner2.x - curevDist*flipX, y: corner2.y}
-        //     let corner22 = {x: corner2.x, y: corner2.y + curevDist*flipY}
-    
-        //     ctx.beginPath()
-        //     ctx.moveTo(lastpoint.x, lastpoint.y)
-        //     ctx.quadraticCurveTo(corner1.x, corner1.y, corner1.x, corner1.y + curveDistance)
-        //     ctx.lineTo(corner1.x, point.y + relPosY*2)
-        //     let corner2Y = point.y + relPosY*2 + curveDistance
-        //     ctx.quadraticCurveTo(corner1.x, corner2Y, corner1.x - curveDistance, corner2Y)
-        //     // ctx.lineTo(corner12.x, corner12.y)
-        //     // ctx.quadraticCurveTo(corner1.x, corner1.y, corner11.x, corner11.y)
-        //     // ctx.lineTo(point.x, point.y)
-        //     // ctx.lineTo(point.x, point.y)
-        //     ctx.stroke()
-        // }
-        // else {
-            // calculate vertical & horizontal mid
-            let midX = (point.x + lastpoint.x)/2
-            let midY = (point.y + lastpoint.y)/2
-    
+            let corner1 = { x: point.x, y: midY }
+            let corner2 = { x: lastpoint.x, y: midY }
+            let curevDist = Math.min(curveDistance, Math.abs(corner1.x - midX))
+            
+            let corner11 = {x: corner1.x - curevDist*flipX, y: corner1.y}
+            let corner12 = {x: corner1.x, y: corner1.y + curevDist*flipY}
+            let corner21 = {x: corner2.x + curevDist*flipX, y: corner2.y}
+            let corner22 = {x: corner2.x, y: corner2.y - curevDist*flipY}
+            
+            ctx.beginPath()
+            ctx.moveTo(lastpoint.x, lastpoint.y)
+            ctx.lineTo(corner22.x, corner22.y)
+            ctx.quadraticCurveTo(corner2.x, corner2.y, corner21.x, corner21.y)
+            ctx.lineTo(corner11.x, corner11.y)
+            ctx.quadraticCurveTo(corner1.x, corner1.y, corner12.x, corner12.y)
+            ctx.lineTo(point.x, point.y)
+            ctx.stroke()
+        }
+        else {
             let corner1 = {x: midX, y: point.y}
             let corner2 = {x: midX, y: lastpoint.y}
             let curevDist = Math.min(curveDistance, Math.abs(corner1.y - midY))
@@ -91,9 +84,7 @@ export class Connector extends Node{
             // ctx.lineTo(point.x, point.y)
             ctx.lineTo(point.x, point.y)
             ctx.stroke()
-
-        // }
-
+        }
     }
 
     draw(ctx) {
